@@ -131,7 +131,7 @@ The frontend UI will be available at: [http://localhost:8501](http://localhost:8
 ## 🙋‍♂️ Using the App: Login & Registration
 
 After launching the app (via Docker or local execution), access it in your browser. Before chatting, you must log in:
-
+![Login Interface](chatbot_app.PNG)
 ### 🆕 New User (Register):
 1. Enter your **Username** and **Password**.
 2. ✅ Check the box labeled **"Register"**.
