@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException
-from vector_search.search import COVID19ConsultantChatbot
+from LLM_generated_engine.LLM_engine import COVID19ConsultantChatbot
 from utils.async_utils import async_retry
 from models.chatbot_query_model import ChatbotQueryInput, ChatbotQueryOutput
 from models.user_request import UserRequest, MessageStoreRequest
@@ -45,7 +45,6 @@ async def query_covid_consultation(query: ChatbotQueryInput) -> ChatbotQueryOutp
     graph_db.store_message(query.user_id, query.text, "user")
     query_response = await query_covid_consultation_with_retry(query.text)
     extracted_data = covid19ConsultantChatbot.extract_information(query.text)
-    print(extracted_data)
     graph_db.update_user_info(extracted_data, query.user_id)
     graph_db.store_message(query.user_id, query_response.output, "assistant")
     return query_response

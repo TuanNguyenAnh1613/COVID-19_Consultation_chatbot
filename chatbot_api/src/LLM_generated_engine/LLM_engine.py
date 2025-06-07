@@ -1,7 +1,7 @@
 from chains.covid19_consultant_chain import review_template
 import dotenv
 import os 
-from vector_search.search_engine import VectorSearchEngine
+from LLM_generated_engine.search_engine import VectorSearchEngine
 import numpy as np
 from langchain.chat_models import ChatOpenAI
 from langchain.schema import HumanMessage
@@ -35,8 +35,14 @@ class COVID19ConsultantChatbot:
             model_name=self.model_name,
             temperature=0.7
         )
-        
+
+     
     def query(self, question):
+        """
+        This function will be use to generate the response under hood of LLM including:
+        1. Fetching top 5 the highest similarity score document as the context for LLM 
+        2. Generate the response for the user's query using the LLM
+        """
         # Perform Vector Similarity Search 
         context = self.search_engine.vector_similarity_search(query=question, k=5)
         prompt = review_template.format(
@@ -48,6 +54,10 @@ class COVID19ConsultantChatbot:
         return response.content.strip()
     
     def extract_information(self, question):
+        """
+        This function will be use to extract the user's information: name, age, conditons, symptoms, family members.
+        Behind the scence, we use prompt-based techniques to extract this from user's queries. And the output in Json format. 
+        """
         prompt = extraction_prompt_template.format(
             user_input=question
         )
