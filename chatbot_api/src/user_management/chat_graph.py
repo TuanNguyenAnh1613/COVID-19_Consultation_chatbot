@@ -89,6 +89,7 @@ class ChatGraph:
             CREATE (m:MESSAGE {text: $text, role: $role, timestamp: $timestamp})
             CREATE (m)-[:SENT]->(u)
             """
+        
         with self.driver.session() as session:
             session.run(query, user_id=user_id, text=text, role=role, timestamp=timestamp)
             LOGGER.info(f"Message stored for user ID {user_id}")

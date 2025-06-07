@@ -9,7 +9,7 @@ import streamlit as st
     References: "https://docs.streamlit.io/develop/tutorials/llms/build-conversational-apps"
 """
 
-CHATBOT_GENERATE_URL = os.getenv("CHATBOT_URL", "http://localhost:8000/covid-consultation")
+CHATBOT_GENERATE_URL = os.getenv("CHAT_GENERATE_URL", "http://localhost:8000/covid-consultation")
 CHATBOT_URL = os.getenv("CHATBOT_URL", "http://localhost:8000/user-request")
 CHATBOT_HISTORY_URL = os.getenv("CHATBOT_HISTORY_URL", "http://localhost:8000/chat-history")
 with st.sidebar:
