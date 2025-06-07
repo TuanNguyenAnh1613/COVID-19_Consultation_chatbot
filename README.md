@@ -80,6 +80,7 @@ This chatbot system integrates several AI components to enable intelligent, pers
   - (FamilyMember)-[:HAS_CONDITION]->(Condition)
   - (User) -[:SENT]-> (Message)
 - Session state is tracked using `st.session_state` in Streamlit for temporary memory.
+![workflow_chart](workflow_chart.PNG)
 ## 🚀 Running the Project
 
 ### 📦 Requirements
