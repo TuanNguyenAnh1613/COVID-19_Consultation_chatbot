@@ -81,6 +81,27 @@ This chatbot system integrates several AI components to enable intelligent, pers
   - (User) -[:SENT]-> (Message)
 - Session state is tracked using `st.session_state` in Streamlit for temporary memory.
 ![workflow_chart](workflow_chart.PNG)
+
+## 🗂 Project Structure
+
+Below is an overview of the key components and folder structure used in this project:
+
+### 📦 Backend Directory: `chatbot_api/src`
+
+This folder contains the backend logic including the FastAPI server, vector search, user profile management, and LLM-based response generation.
+
+- **Prompt Templates**  
+  `chatbot_api/src/models`  
+  Contains system prompts and templates used to guide the LLM for consistent behavior and structured responses.
+
+- **Response Generation Logic**  
+  `chatbot_api/src/LLM_generated_engine`  
+  Contains core logic to call the LLM model, assemble prompts, and handle input-output formatting with retrieved context.
+
+- **Database Execution Layer**
+  `chatbot_api/src/user_management/chat_graph.py`  
+  Handles interaction with the **Neo4j Graph Database**, including storing and querying user profiles, relationships, and chat history.
+  
 ## 🚀 Running the Project
 
 ### 📦 Requirements
