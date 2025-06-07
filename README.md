@@ -26,8 +26,7 @@ This chatbot system integrates several AI components to enable intelligent, pers
 
 - The chatbot uses **FAISS** (Facebook AI Similarity Search) to perform fast vector-based retrieval over a knowledge base of COVID-19 domain data.
 - The texts are embedded using the **`all-MiniLM-L6-v2`** model from `sentence-transformers`, a compact yet powerful transformer that balances performance and speed.
-- The indexing process will load the data from Json file with structure {'user':...., 'assistant':...}. The user query and assistant's response will combine into the text block. Then, This combined text is passed through all-MiniLM-L6-v2 to generate a vector embedding.
-The embedding is stored and indexed in FAISS, enabling fast similarity search during chat interactions. All the index and metadata file are stored in the `chatbot_api/src/Output`. We can update this by deleting this Output folder, Adding the Json file to the `chatbot_api/src/data`, and then, will automatically create the vector database in the first. 
+- The indexing process will load the data from Json file with structure {'user':...., 'assistant':...}. The user query and assistant's response will combine into the text block. Then, This combined text is passed through all-MiniLM-L6-v2 to generate a vector embedding. The embedding is stored and indexed in FAISS, enabling fast similarity search during chat interactions. **All the index and metadata file are stored in the `chatbot_api/src/Output`. We can update this by deleting this Output folder, Adding the Json file to the `chatbot_api/src/data`, and then, will automatically create the vector database in the first**. 
 - When a user query is submitted:
   - It’s converted into a vector using `all-MiniLM-L6-v2`
   - FAISS is queried to return top relevant context passages
@@ -45,12 +44,15 @@ The embedding is stored and indexed in FAISS, enabling fast similarity search du
 
 ### 🗃 3. Information Extraction
 
-- The user's input is parsed using rule-based logic or LLM-assisted parsing to extract relevant information, such as:
+- The user's input is parsed using LLM-assisted parsing through prompting to extract relevant information, such as:
   - Symptoms mentioned
-  - Risk factors
+  - Health Conditions
   - Mentioned individuals (e.g., family members, colleagues)
-- Extracted data is stored in memory to support future turns in the conversation.
-- Named Entity Recognition (NER) or simple regex may be used to identify key elements.
+- This extracted information is return in the Json format and, then store in the Graph database through Neo4J.
+- **On-going Improvement**:
+  - Extracted data is stored in memory to support future turns in the conversation.
+  - In this design, the extracted data is tied to the response generation process --> Increasing the user-perceived latency --> In the future, we will decoupling these two processes. 
+
 
 ### 👤 4. User Profile and Context Management
 
@@ -58,19 +60,91 @@ The embedding is stored and indexed in FAISS, enabling fast similarity search du
   - Basic profile (e.g., age, existing conditions)
   - Conversation history
   - Related individuals and their attributes
+- All of extracted information is extracted in the above **Information Extraction** with Json format. For example:
+  {
+  "name": "John",
+  "age": 42,
+  "symptoms": ["sore throat", "fever"],
+  "health_conditions": [],
+  "family_members": [
+    {{
+      "relation": "father",
+      "age": null
+      "condition": ["diabetes"]
+    }}
+  ]
+}).
+- And, from these Jsons, For longer retention, user profiles can be stored in a database Neo4j for relationships as follows:
+  - (User)-[:HAS_SYMPTOM]->(Symptom)
+  - (User)-[:RELATED_TO]->(FamilyMember)
+  - (FamilyMember)-[:HAS_CONDITION]->(Condition)
+  - (User) -[:SENT]-> (Message)
 - Session state is tracked using `st.session_state` in Streamlit for temporary memory.
-- For longer retention, user profiles can be stored in a database (e.g., Neo4j for relationships, or MongoDB for flexible schema).
-
 ## 🚀 Running the Project
 
 ### 📦 Requirements
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop)
 - Docker Compose (comes with Docker Desktop)
-
-### 🔧 Run the Full Stack
+  
+### 🔧 Run the Full Stack In Docker 
 
 In the project root directory:
 
 ```bash
 docker compose up --build
+```
+
+
+### 🧪 Run the App Locally (Without Docker)
+
+
+If you prefer to run the backend and frontend manually:
+
+
+#### 1. Update `.env` Configuration
+
+
+Modify the `.env` file with the required API keys and settings.
+
+
+#### 2. Run the Backend
+
+```bash
+cd chatbot_api/src
+uvicorn main:app --reload
+```
+
+The backend will be available at: [http://localhost:8000](http://127.0.0.1:8000)
+
+#### 3. Run the Frontend
+
+In a new terminal:
+
+```bash
+cd chatbot_frontend/src
+streamlit run main.py
+```
+
+The frontend UI will be available at: [http://localhost:8501](http://localhost:8501)
+
+## 🙋‍♂️ Using the App: Login & Registration
+
+After launching the app (via Docker or local execution), access it in your browser. Before chatting, you must log in:
+
+### 🆕 New User (Register):
+1. Enter your **Username** and **Password**.
+2. ✅ Check the box labeled **"Register"**.
+3. Click **Submit** to create your account.
+
+> This will register your profile and initialize a new session with memory.
+
+### 🔐 Existing User (Login):
+1. Enter your **Username** and **Password**.
+2. ❌ Leave the **"Register"** box **unchecked**.
+3. Click **Submit** to log in with your existing account.
+
+> After that, starting chat. 
+
+
+ 
